@@ -149,6 +149,15 @@ class WinBoard(pygame.sprite.Sprite):
         self.image = self.font.render(self.text,1,WHITE)
         self.rect = (300,410)
 
+class LossBoard(pygame.sprite.Sprite):
+    def __init__(self):
+        #inicjalizuj klasę bazową
+        pygame.sprite.Sprite.__init__(self)
+        self.text = "YOU LOST :c TRY AGAIN"
+        self.font = pygame.font.SysFont(None, 50)
+        self.image = self.font.render(self.text,1,WHITE)
+        self.rect = (300,410)
+
 ## ----------------main -------------
 def main():
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
@@ -172,14 +181,40 @@ def main():
     addlogsl = 0
     addlogsr = 0
     lives = 3
-    frogs_arrived = 0
+    frogs_arrived = -1
     time = 0
     #start_time = pygame.time.get_ticks()
     end_time = 0
-    win = 1
+    win_am = 1
     
     while sit:
-        if frogs_arrived <= 5:
+
+        if frogs_arrived == -1:
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sit = False
+                elif event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        sit = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = event.pos  # gets mouse position
+                    if button.collidepoint(mouse_pos):
+                        frogs_arrived += 1
+
+            screen.blit(background, (0, 0))
+            button = pygame.Rect(300, 480, 450, 50) ##left top wifth height
+            pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
+            font = pygame.font.SysFont(None, 24)
+            img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255,244,244))
+            screen.blit(img, (310, 500))
+            
+            font2 = pygame.font.SysFont("comicsansms", 50)
+            title = font2.render('WELCOME TO THE GAME FROGGER', True, (255,244,244))
+            screen.blit(title, (100, 300))
+            pygame.display.flip()
+
+        elif 0 <= frogs_arrived <= 5:
         
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -297,11 +332,7 @@ def main():
                 scoreboardSprite.update()
                 scoreboardSprite.clear(screen, background)
                 scoreboardSprite.draw(screen)
-                if lives<=0:
-                    print("Koniec gry")
-                    frogs_arrived = 6
-                    end_time = pygame.time.get_ticks()
-                    win = 0
+            
 
             for hit in pygame.sprite.groupcollide(cars_sprites,frog_sprite,False, True):
                 frog = Frog()
@@ -310,10 +341,6 @@ def main():
                 scoreboardSprite.update()
                 scoreboardSprite.clear(screen, background)
                 scoreboardSprite.draw(screen)
-                if lives<=0:
-                    frogs_arrived = 6
-                    end_time = pygame.time.get_ticks()
-                    win = 0
 
             ###wejście na kłodę
             for log_travel in pygame.sprite.groupcollide(logs_sprites, frog_sprite, 0, 0):
@@ -337,11 +364,21 @@ def main():
             cars_sprites.draw(screen)
             logs_sprites.draw(screen)
             frog_sprite.draw(screen)
+            
+            if lives <= 0:
+                    print("Koniec gry")
+                    frogs_arrived = 6
+                    end_time = pygame.time.get_ticks()
+                    win_am = 0
 
             pygame.display.flip()
 
         # ------------- poza główną akcją-------------
         else:
+            cars_sprites.clear(screen, background)
+            logs_sprites.clear(screen, background)
+            frog_sprite.clear(screen, background)
+            
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sit = False
@@ -353,21 +390,16 @@ def main():
 
                     if button.collidepoint(mouse_pos):
                         main()
-                    
-                cars_sprites.clear(screen, background)
-                logs_sprites.clear(screen, background)
-                frog_sprite.clear(screen, background)
-
+                
+                if win_am:
+                    win_table = WinBoard(end_time/1000,"WON")
+                else:  
+                    win_table = LossBoard()
 
                 button = pygame.Rect(300, 480, 420, 50) ##left top wifth height
                 pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
-                
-                #if win:
-                win = WinBoard(end_time/1000,"WON")
-                #else:  
-                #    win = WinBoard(end_time/1000,"LOST")
 
-                scoreboardSprite.add(win)
+                scoreboardSprite.add(win_table)
                 scoreboardSprite.draw(screen)
                 font = pygame.font.SysFont(None, 24)
                 img = font.render('PRESS ENTER OR THIS BUTTON TO START AGAIN', True, (255,244,244))
