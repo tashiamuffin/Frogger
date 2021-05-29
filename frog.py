@@ -4,7 +4,9 @@ from pygame.locals import *
 from sys import exit
 import random
 
-#### TRZEBA TERAZ DODAĆ WPADANIE DO WODY + LICZNIK CZASU + LICZNIK ŻYĆ  
+
+### dodać do req:  utils-pygame 
+
 SCREEN_WIDTH = 1102
 SCREEN_HEIGHT = 804
 WHITE = (255,255,255)
@@ -27,6 +29,17 @@ car4 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\auto4.
 car5 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\police.png').convert_alpha()
 log = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\lg.png').convert_alpha()
 logl = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\logl.png').convert_alpha()
+
+pygame.mixer.init()
+
+
+boing = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\boing.mp3")
+car_crash = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\car_crash.mp3")
+water_fall = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\water_fall.mp3")
+game_over = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\game_over.wav")
+jingle = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\jingle.mp3")
+pygame.mixer.Sound.set_volume(jingle, 0.1)
+
 
 
 class Frog(pygame.sprite.Sprite):
@@ -121,6 +134,7 @@ class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
 
+#-------------------tablice z wynikami------
 
 class LiveBoard(pygame.sprite.Sprite):
     def __init__(self):
@@ -142,6 +156,7 @@ class LiveBoard(pygame.sprite.Sprite):
 class WinBoard(pygame.sprite.Sprite):
     def __init__(self,time, text):
         #inicjalizuj klasę bazową
+        pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.time = time
         self.text = ("YOU {} with time: %4d s" % int(self.time)).format(text)
@@ -152,11 +167,23 @@ class WinBoard(pygame.sprite.Sprite):
 class LossBoard(pygame.sprite.Sprite):
     def __init__(self):
         #inicjalizuj klasę bazową
+        pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = "YOU LOST :c TRY AGAIN"
         self.font = pygame.font.SysFont(None, 50)
         self.image = self.font.render(self.text,1,WHITE)
         self.rect = (300,410)
+
+class MusicBoard(pygame.sprite.Sprite):
+    def __init__(self, text):
+        #inicjalizuj klasę bazową
+        pygame.font.init()
+        pygame.sprite.Sprite.__init__(self)
+        self.text = text
+        self.font = pygame.font.SysFont(None,40)
+        self.image = self.font.render(self.text,1,(0,0,0))
+        self.rect = (955,220)
+
 
 ## ----------------main -------------
 def main():
@@ -174,8 +201,9 @@ def main():
     scoreboardSprite.draw(screen)
     pygame.display.flip()
 
+    musicSprite = pygame.sprite.RenderClear()
     clock = pygame.time.Clock()
-    ##generowanie tła 
+
     sit = True
     addenemyfighterCounter = 0
     addlogsl = 0
@@ -183,15 +211,22 @@ def main():
     lives = 3
     frogs_arrived = -1
     time = 0
-    #start_time = pygame.time.get_ticks()
     end_time = 0
     win_am = 1
-    
-    while sit:
+    music = 1
 
-        if frogs_arrived == -1:
+    while sit:
+        
+        ## -------strona startowa ---------------------
+
+        if frogs_arrived == -1: #obsługa muzyki w tle
+            if music == 1:
+                jingle.play(-1)
+
+            ###zasady, o autorze, exit, leaderboard, konfig
             
             for event in pygame.event.get():
+
                 if event.type == pygame.QUIT:
                     sit = False
                 elif event.type == KEYDOWN:
@@ -199,37 +234,120 @@ def main():
                         sit = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos  # gets mouse position
-                    if button.collidepoint(mouse_pos):
+
+                    if button.collidepoint(mouse_pos): #przycisk startu
                         frogs_arrived += 1
 
-            screen.blit(background, (0, 0))
-            button = pygame.Rect(300, 480, 450, 50) ##left top wifth height
-            pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
-            font = pygame.font.SysFont(None, 24)
-            img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255,244,244))
-            screen.blit(img, (310, 500))
-            
-            font2 = pygame.font.SysFont("comicsansms", 50)
-            title = font2.render('WELCOME TO THE GAME FROGGER', True, (255,244,244))
-            screen.blit(title, (100, 300))
-            pygame.display.flip()
+                    elif ex_but.collidepoint(mouse_pos): #exit
+                        sit = False
 
+                    elif music_but.collidepoint(mouse_pos): #muzyka on/off
+                        if music == 1:
+                            music = 0
+                            jingle.stop()
+                        elif music == 0:
+                            music = 1
+                            jingle.play(-1)
+                        
+                        
+                
+                #pygame.display.flip()
+
+                screen.blit(background, (0, 0))
+                
+                ##obsługa przycisku do muzyki
+                if music == 1:
+                    off_t = MusicBoard("on")
+                    musicSprite.empty()
+                    musicSprite.add(off_t)
+                            
+                elif music == 0:
+                    on_t = MusicBoard("off")
+                    musicSprite.empty()
+                    musicSprite.add(on_t)
+                
+                ##logo
+                frog_im = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\gra\images\frogger.png').convert_alpha()
+                screen.blit(frog_im, (310, 300))
+
+                ##budowa przycisku start
+                button = pygame.Rect(300, 400, 450, 50) ##left top wifth height
+                pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
+                font = pygame.font.SysFont(None, 24)
+                img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255,244,244))
+                screen.blit(img, (310, 420))
+                
+                ###labelki
+                font3 = pygame.font.SysFont("comicsansms", 40)
+                title = font3.render('LEADERBOARD', True, (0,50,50))
+                screen.blit(title, (20, 30))
+
+                title = font3.render('AUTHOR:', True, (0,50,50))
+                screen.blit(title, (820, 30))
+
+                title = font3.render('CONFIG', True, (0,50,50))
+                screen.blit(title, (820, 150))
+
+                title = font3.render('THE RULES:', True, (255, 221, 0))
+                screen.blit(title, (400, 510))
+
+                font4 = pygame.font.SysFont(None, 30)
+                title = font4.render('Natalia Lach', True, (0,100,100))
+                screen.blit(title, (820, 90))
+                
+                ##zasady
+                title = font4.render('This is a classic arcade game, in which your goal is to lead the frog family across the street and river.', True, (200,200,200))
+                screen.blit(title, (80, 575))
+                title = font4.render('Attention! The frog dies when it is hit by the car or when it falls to the water.', True, (200,200,200))
+                screen.blit(title, (150, 610))
+                title = font4.render('Once all the five frogs are safe on the lily pads, you win.', True, (200,200,200))
+                screen.blit(title, (250, 645))
+                title = font4.render('You steer the frog with key arrows.', True, (200,200,200))
+                screen.blit(title, (350, 700))
+
+                ##przycisk exit
+                ex_but = pygame.Rect(1000, 760, 102, 40) ##left top wifth height
+                pygame.draw.rect(screen, [0, 0, 0], ex_but)  # draw button
+                font5 = pygame.font.SysFont(None, 40)
+                title = font5.render('EXIT', True, (0,100,100))
+                screen.blit(title, (1015, 770))
+
+                ##label do muzyki i przycisk
+                music_but = pygame.Rect(950, 215, 50, 40) ##left top wifth height
+                pygame.draw.rect(screen, [255,255,255], music_but) # draw button
+                font5 = pygame.font.SysFont(None, 40)
+                title = font5.render('MUSIC:', True, (0,100,100))
+                screen.blit(title, (820, 220))
+
+                musicSprite.update()
+                musicSprite.draw(screen)
+
+                pygame.display.flip()
+
+        #------------------------gra właściwa---------------------
         elif 0 <= frogs_arrived <= 5:
         
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sit = False
                 elif event.type == KEYDOWN:
+
                     if event.key == K_ESCAPE:
                         sit = False
+
                     elif event.key == K_LEFT:
                         frog.position[0] = frog.position[0] - 60
                         frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_left.png').convert_alpha()
+                        pygame.mixer.Channel(0).play(boing)
+
                     elif event.key == K_RIGHT:
                         frog.position[0] = frog.position[0] + 60
                         frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_right.png').convert_alpha()
+                        pygame.mixer.Channel(0).play(boing)
+
                     elif event.key == K_UP:
                         ####gdy żaba jest u samej góry i chce wejść na bezpieczną lilię
+                        pygame.mixer.Channel(0).play(boing)
                         if frog.position[1] < 130 and 520<frog.position[0]<570:
                             frog.position[1] = 60
                             frog.position[0] = 545
@@ -274,44 +392,34 @@ def main():
                         elif frog.position[1] > 130:
                             frog.position[1] = frog.position[1] - 60
                             frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
-                    elif event.key == K_DOWN:
-                        frog.position[1] = frog.position[1] + 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
 
-                elif event.type == KEYDOWN:
-                    if event.key == K_ESCAPE:
-                        running = False
-                    elif event.key == K_LEFT:
-                        frog.position[0] = frog.position[0] - 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_left.png').convert_alpha()
-                    elif event.key == K_RIGHT:
-                        frog.position[0] = frog.position[0] + 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_right.png').convert_alpha()
-                    elif event.key == K_UP:
-                        frog.position[1] = frog.position[1] - 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
                     elif event.key == K_DOWN:
                         frog.position[1] = frog.position[1] + 60
                         frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                        pygame.mixer.Channel(0).play(boing)
+
 
                 screen.blit(background, (0, 0))
                 scoreboardSprite.draw(screen)
                 frog_sprite.draw(screen)
                 pygame.display.update()
             
+            ###update liczników do generowania obiektów
             addenemyfighterCounter += 1
             addlogsl += 1
             addlogsr += 1
             time +=1
-            ###render aut i logów
 
+            ###render aut i logów
             if addenemyfighterCounter >= 200:
                 cars_sprites.add(cars())
                 cars_sprites.add(cars())
                 addenemyfighterCounter = 0
+
             if addlogsl >= 350:
                 logs_sprites.add(logsl())
                 addlogsl = 0
+
             if addlogsr >= 260:
                 logs_sprites.add(logsr())
                 addlogsr = 0
@@ -323,7 +431,7 @@ def main():
             logs_sprites.update()
             frog_sprite.update()
             
-            ###uderzenie autem
+            ### wpadniecie do wody
             if frog.position[1] < 400 and len(pygame.sprite.groupcollide(logs_sprites, frog_sprite, 0, 0)) == 0:
                 frog.kill()
                 frog = Frog()
@@ -332,8 +440,9 @@ def main():
                 scoreboardSprite.update()
                 scoreboardSprite.clear(screen, background)
                 scoreboardSprite.draw(screen)
-            
+                pygame.mixer.Channel(2).play(water_fall)
 
+            ## uderzenie autem
             for hit in pygame.sprite.groupcollide(cars_sprites,frog_sprite,False, True):
                 frog = Frog()
                 lives -= 1
@@ -341,6 +450,7 @@ def main():
                 scoreboardSprite.update()
                 scoreboardSprite.clear(screen, background)
                 scoreboardSprite.draw(screen)
+                pygame.mixer.Channel(2).play(car_crash)
 
             ###wejście na kłodę
             for log_travel in pygame.sprite.groupcollide(logs_sprites, frog_sprite, 0, 0):
@@ -365,6 +475,7 @@ def main():
             logs_sprites.draw(screen)
             frog_sprite.draw(screen)
             
+            ###koniec gry
             if lives <= 0:
                     print("Koniec gry")
                     frogs_arrived = 6
@@ -373,7 +484,7 @@ def main():
 
             pygame.display.flip()
 
-        # ------------- poza główną akcją-------------
+        # ------------- poza główną akcją, ekran końcowy-------------
         else:
             cars_sprites.clear(screen, background)
             logs_sprites.clear(screen, background)
@@ -388,22 +499,35 @@ def main():
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos  # gets mouse position
 
-                    if button.collidepoint(mouse_pos):
+                    if button.collidepoint(mouse_pos): ##restart gry
                         main()
+
+                    if ex_but.collidepoint(mouse_pos): ##wyjście
+                        sit = False
                 
+                ###render wiadomości
                 if win_am:
                     win_table = WinBoard(end_time/1000,"WON")
                 else:  
                     win_table = LossBoard()
-
+                
+                
+                ##przycisk restartu
                 button = pygame.Rect(300, 480, 420, 50) ##left top wifth height
                 pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
-
-                scoreboardSprite.add(win_table)
-                scoreboardSprite.draw(screen)
                 font = pygame.font.SysFont(None, 24)
                 img = font.render('PRESS ENTER OR THIS BUTTON TO START AGAIN', True, (255,244,244))
                 screen.blit(img, (310, 500))
+
+                ##przycisk wyjścia
+                ex_but = pygame.Rect(1000, 760, 102, 40) ##left top wifth height
+                pygame.draw.rect(screen, [0, 0, 0], ex_but)  # draw button
+                font5 = pygame.font.SysFont(None, 40)
+                title = font5.render('EXIT', True, (0,100,100))
+                screen.blit(title, (1015, 770))
+
+                scoreboardSprite.add(win_table)
+                scoreboardSprite.draw(screen)
                                     
                 pygame.display.flip()
     
