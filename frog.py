@@ -14,6 +14,8 @@ pygame.init()
 
 screen = pygame.display.set_mode((1102,804), 0, 0) ###background ma 1102x804, width, depth 
 pygame.display.set_caption('Frogger')
+programIcon = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png')
+pygame.display.set_icon(programIcon)
 ##ładowanie obrazków
 
 background = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\bg.jpg').convert()
@@ -184,7 +186,26 @@ class MusicBoard(pygame.sprite.Sprite):
         self.image = self.font.render(self.text,1,(0,0,0))
         self.rect = (955,220)
 
+##-----------------funkcje do obsługi pliku do leaderboardu
+def leaderboard_top(file):
+    try:
+        leaderboard_file = open(file,'r')
+        leaderboard = leaderboard_file.readlines()
+        leaderboard_file.close()
+        lead_list = [int(leaderboard[i][:-1]) for i in range(0,len(leaderboard))]
+        lead_list.sort()
 
+        if len(leaderboard)<5:
+            return lead_list
+        else:
+            return lead_list[:5]
+    except FileNotFoundError:
+        return []
+
+def leaderboard_add(file,text):
+    leaderboard_file = open(file,'a')
+    leaderboard_file.write(text + "\n")
+    leaderboard_file.close()
 ## ----------------main -------------
 def main():
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
@@ -214,7 +235,7 @@ def main():
     end_time = 0
     win_am = 1
     music = 1
-
+    file = r"l.txt"
     while sit:
         
         ## -------strona startowa ---------------------
@@ -294,6 +315,21 @@ def main():
                 font4 = pygame.font.SysFont(None, 30)
                 title = font4.render('Natalia Lach', True, (0,100,100))
                 screen.blit(title, (820, 90))
+
+                fontL = pygame.font.SysFont(None, 30)
+                title = fontL.render('NORMAL:', True, (0,50,50))
+                screen.blit(title, (20, 90))
+                ##leaderboard:
+                leaderboard_list = leaderboard_top(file)
+                y = 120
+                n = 1
+                for i in leaderboard_list:
+                    title = font4.render(str(i), True, (0,100,100))
+                    screen.blit(title, (50, y))
+                    title = font4.render(str(n) + ".", True, (0,50,50))
+                    screen.blit(title, (30, y))
+                    n+=1
+                    y += 30
                 
                 ##zasady
                 title = font4.render('This is a classic arcade game, in which your goal is to lead the frog family across the street and river.', True, (200,200,200))
@@ -315,10 +351,10 @@ def main():
                 ##label do muzyki i przycisk
                 music_but = pygame.Rect(950, 215, 50, 40) ##left top wifth height
                 pygame.draw.rect(screen, [255,255,255], music_but) # draw button
-                font5 = pygame.font.SysFont(None, 40)
+            
                 title = font5.render('MUSIC:', True, (0,100,100))
                 screen.blit(title, (820, 220))
-
+                
                 musicSprite.update()
                 musicSprite.draw(screen)
 
@@ -462,6 +498,8 @@ def main():
             if frogs_arrived == 5:
                 frogs_arrived +=1
                 end_time = pygame.time.get_ticks()
+                time_sec = round(end_time/1000)
+                leaderboard_add(file, str(time_sec))
 
 
             #Wyczyść ekran
