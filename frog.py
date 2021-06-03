@@ -5,7 +5,7 @@ from sys import exit
 import random
 
 
-### dodać do req:  utils-pygame 
+### dodać poziomy
 
 SCREEN_WIDTH = 1102
 SCREEN_HEIGHT = 804
@@ -14,45 +14,43 @@ pygame.init()
 
 screen = pygame.display.set_mode((1102,804), 0, 0) ###background ma 1102x804, width, depth 
 pygame.display.set_caption('Frogger')
-programIcon = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png')
+programIcon = pygame.image.load(r'images/zaba.png')
 pygame.display.set_icon(programIcon)
 ##ładowanie obrazków
 
-background = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\bg.jpg').convert()
-frog_up = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
-frog_done = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
-frog_left = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_left.png').convert_alpha()
-frog_right = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_right.png').convert_alpha()
-frpg_down = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
-car1 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\auto1.png').convert_alpha()
-car2 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\auto2.png').convert_alpha()
-car3 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\auto3.png').convert_alpha()
-car4 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\auto4.png').convert_alpha()
-car5 = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\police.png').convert_alpha()
-log = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\lg.png').convert_alpha()
-logl = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\logl.png').convert_alpha()
+background = pygame.image.load('images/bg.jpg').convert()
+frog_up = pygame.image.load(r'images/zaba.png').convert_alpha()
+frog_left = pygame.image.load(r'images/zaba_left.png').convert_alpha()
+frog_right = pygame.image.load(r'images/zaba_right.png').convert_alpha()
+frpg_down = pygame.image.load(r'images/zaba_down.png').convert_alpha()
+car1 = pygame.image.load(r'images/auto1.png').convert_alpha()
+car2 = pygame.image.load(r'images/auto2.png').convert_alpha()
+car3 = pygame.image.load(r'images/auto3.png').convert_alpha()
+car4 = pygame.image.load(r'images/auto4.png').convert_alpha()
+car5 = pygame.image.load(r'images/police.png').convert_alpha()
+log = pygame.image.load(r'images/lg.png').convert_alpha()
+logl = pygame.image.load(r'images/logl.png').convert_alpha()
 
 pygame.mixer.init()
 
-
-boing = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\boing.mp3")
-car_crash = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\car_crash.mp3")
-water_fall = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\water_fall.mp3")
-game_over = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\game_over.wav")
-jingle = pygame.mixer.Sound(r"C:\Users\admin\OneDrive\Pulpit\gra\images\jingle.mp3")
+boing = pygame.mixer.Sound(r"images\boing.mp3")
+car_crash = pygame.mixer.Sound(r"images\car_crash.mp3")
+water_fall = pygame.mixer.Sound(r"images\water_fall.mp3")
+game_over = pygame.mixer.Sound(r"images\game_over.wav")
+jingle = pygame.mixer.Sound(r"images\jingle.mp3")
 pygame.mixer.Sound.set_volume(jingle, 0.1)
 
-
+file = r"l.txt"
 
 class Frog(pygame.sprite.Sprite):
     def __init__(self):
         # Inicjalizuj klasę bazową Sprite
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
+        self.image = frog_up
         self.rect = self.image.get_rect() #rozmiar rysunku
         self.position = [SCREEN_WIDTH/2, SCREEN_HEIGHT - 25]
         self.rect.center = (self.position[0], self.position[1]) #pozycja początkowa
-        self.ability = 1 ###umiejętność poruszania się, gdy jest -1 to nie może się ruszać ( jest już na górze szczęsliwa i czeka na inne żabki)
+        self.ability = 1 ###umiejętność poruszania się, gdy jest -1 to nie może się ruszać (jest już na górze szczęsliwa i czeka na inne żabki)
 
     def update(self):
         if self.ability == 1: ##jeśli może się poruszać to
@@ -67,7 +65,7 @@ class Frog(pygame.sprite.Sprite):
                 self.rect.bottom = SCREEN_HEIGHT
 
         elif self.ability == 0: ## jej ostatni skok na bezpieczne miejsce
-            self.rect.center = (self.position[0],self.position[1])#move in-place
+            self.rect.center = (self.position[0], self.position[1])#move in-place
 
             if self.rect.left < 0:
                 self.rect.left = 0
@@ -87,13 +85,13 @@ class cars(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice([car1, car2, car3, car4, car5])
         self.rect = self.image.get_rect()
-        self.position = random.choice([[0,730], [0,660], [0,600], [0,540],[0,470]])
-        self.rect.center = (self.position[0],self.position[1])
+        self.position = random.choice([[0, 730], [0, 660], [0, 600], [0, 540], [0, 470]])
+        self.rect.center = (self.position[0], self.position[1])
         self.x_velocity = 0.5
 
     def update(self):
         self.position[0] += self.x_velocity
-        self.rect.center = (self.position[0],self.position[1])
+        self.rect.center = (self.position[0], self.position[1])
         
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH: ##gdy wyjdzie poza ekran to znika
             self.kill()
@@ -107,13 +105,13 @@ class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo
         pygame.sprite.Sprite.__init__(self)
         self.image = log
         self.rect = self.image.get_rect()
-        self.position = [SCREEN_WIDTH,random.choice([300,180])]
+        self.position = [SCREEN_WIDTH, random.choice([300, 180])]
         self.rect.center = (self.position[0],self.position[1])
         self.x_velocity = -0.4
 
     def update(self):
         self.position[0] += self.x_velocity
-        self.rect.center = (self.position[0],self.position[1])#move in-place
+        self.rect.center = (self.position[0], self.position[1])#move in-place
         
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
@@ -125,13 +123,13 @@ class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo
         pygame.sprite.Sprite.__init__(self)
         self.image = logl
         self.rect = self.image.get_rect()
-        self.position = [0,random.choice([360,240,120])]
-        self.rect.center = (self.position[0],self.position[1])
+        self.position = [0, random.choice([360,240,120])]
+        self.rect.center = (self.position[0], self.position[1])
         self.x_velocity = 0.4
 
     def update(self):
         self.position[0] += self.x_velocity
-        self.rect.center = (self.position[0],self.position[1])#move in-place
+        self.rect.center = (self.position[0], self.position[1])#move in-place
         
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
@@ -144,15 +142,15 @@ class LiveBoard(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.lives = 3
         self.text = "lives: %4d" % self.lives
-        self.font = pygame.font.SysFont(None,50)
-        self.image = self.font.render(self.text,1,WHITE)
-        self.rect = (50,5)
+        self.font = pygame.font.SysFont(None, 50)
+        self.image = self.font.render(self.text, 1, WHITE)
+        self.rect = (50, 5)
 
     def update(self):
         self.lives -= 1
         self.text = "Lives: %4d" % self.lives
-        self.image = self.font.render(self.text,1,WHITE)
-        self.rect = (50,5)
+        self.image = self.font.render(self.text, 1, WHITE)
+        self.rect = (50, 5)
 
 
 class WinBoard(pygame.sprite.Sprite):
@@ -162,9 +160,9 @@ class WinBoard(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.time = time
         self.text = ("YOU {} with time: %4d s" % int(self.time)).format(text)
-        self.font = pygame.font.SysFont(None,50)
-        self.image = self.font.render(self.text,1,WHITE)
-        self.rect = (300,410)
+        self.font = pygame.font.SysFont(None, 50)
+        self.image = self.font.render(self.text, 1, WHITE)
+        self.rect = (300, 410)
 
 class LossBoard(pygame.sprite.Sprite):
     def __init__(self):
@@ -173,8 +171,8 @@ class LossBoard(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.text = "YOU LOST :c TRY AGAIN"
         self.font = pygame.font.SysFont(None, 50)
-        self.image = self.font.render(self.text,1,WHITE)
-        self.rect = (300,410)
+        self.image = self.font.render(self.text, 1, WHITE)
+        self.rect = (300, 410)
 
 class MusicBoard(pygame.sprite.Sprite):
     def __init__(self, text):
@@ -182,49 +180,51 @@ class MusicBoard(pygame.sprite.Sprite):
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = text
-        self.font = pygame.font.SysFont(None,40)
-        self.image = self.font.render(self.text,1,(0,0,0))
-        self.rect = (955,220)
+        self.font = pygame.font.SysFont(None, 40)
+        self.image = self.font.render(self.text, 1, (0, 0, 0))
+        self.rect = (955, 220)
 
 ##-----------------funkcje do obsługi pliku do leaderboardu
 def leaderboard_top(file):
     try:
-        leaderboard_file = open(file,'r')
+        leaderboard_file = open(file, 'r')
         leaderboard = leaderboard_file.readlines()
         leaderboard_file.close()
-        lead_list = [int(leaderboard[i][:-1]) for i in range(0,len(leaderboard))]
+        lead_list = [int(leaderboard[i][:-1]) for i in range(0, len(leaderboard))]
         lead_list.sort()
 
-        if len(leaderboard)<5:
+        if len(leaderboard) < 5:
             return lead_list
         else:
             return lead_list[:5]
     except FileNotFoundError:
         return []
 
-def leaderboard_add(file,text):
-    leaderboard_file = open(file,'a')
+def leaderboard_add(file, text):
+    leaderboard_file = open(file, 'a')
     leaderboard_file.write(text + "\n")
     leaderboard_file.close()
+    
 ## ----------------main -------------
 def main():
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
     frog = Frog()                       #stwórz żabe
     frog_sprite.add(frog) 
 
-    # Inicjalizuj statki wroga
+    # Inicjalizuj obiekty
     cars_sprites = pygame.sprite.RenderClear() #kontener dla aut
     cars_sprites.add(cars())
     logs_sprites = pygame.sprite.RenderClear() # kontener dla logs
 
+    ## ilość żyć
     scoreboardSprite = pygame.sprite.RenderClear()
     scoreboardSprite.add(LiveBoard())
     scoreboardSprite.draw(screen)
     pygame.display.flip()
 
     musicSprite = pygame.sprite.RenderClear()
-    clock = pygame.time.Clock()
 
+    ##zmienne
     sit = True
     addenemyfighterCounter = 0
     addlogsl = 0
@@ -235,9 +235,9 @@ def main():
     end_time = 0
     win_am = 1
     music = 1
-    file = r"l.txt"
+    #file = r"l.txt"
+
     while sit:
-        
         ## -------strona startowa ---------------------
 
         if frogs_arrived == -1: #obsługa muzyki w tle
@@ -253,6 +253,9 @@ def main():
                 elif event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         sit = False
+                    if event.key == pygame.K_RETURN:
+                        frogs_arrived += 1
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos  # gets mouse position
 
@@ -269,10 +272,6 @@ def main():
                         elif music == 0:
                             music = 1
                             jingle.play(-1)
-                        
-                        
-                
-                #pygame.display.flip()
 
                 screen.blit(background, (0, 0))
                 
@@ -288,37 +287,38 @@ def main():
                     musicSprite.add(on_t)
                 
                 ##logo
-                frog_im = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\gra\images\frogger.png').convert_alpha()
+                frog_im = pygame.image.load(r'images/frogger.png').convert_alpha()
                 screen.blit(frog_im, (310, 300))
 
                 ##budowa przycisku start
                 button = pygame.Rect(300, 400, 450, 50) ##left top wifth height
                 pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
                 font = pygame.font.SysFont(None, 24)
-                img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255,244,244))
+                img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255, 244, 244))
                 screen.blit(img, (310, 420))
                 
                 ###labelki
                 font3 = pygame.font.SysFont("comicsansms", 40)
-                title = font3.render('LEADERBOARD', True, (0,50,50))
+                title = font3.render('LEADERBOARD', True, (0, 50, 50))
                 screen.blit(title, (20, 30))
 
-                title = font3.render('AUTHOR:', True, (0,50,50))
+                title = font3.render('AUTHOR:', True, (0, 50, 50))
                 screen.blit(title, (820, 30))
 
-                title = font3.render('CONFIG', True, (0,50,50))
+                title = font3.render('CONFIG', True, (0, 50, 50))
                 screen.blit(title, (820, 150))
 
                 title = font3.render('THE RULES:', True, (255, 221, 0))
                 screen.blit(title, (400, 510))
 
                 font4 = pygame.font.SysFont(None, 30)
-                title = font4.render('Natalia Lach', True, (0,100,100))
+                title = font4.render('Natalia Lach', True, (0, 100, 100))
                 screen.blit(title, (820, 90))
 
                 fontL = pygame.font.SysFont(None, 30)
-                title = fontL.render('NORMAL:', True, (0,50,50))
+                title = fontL.render('NORMAL:', True, (0, 50, 50))
                 screen.blit(title, (20, 90))
+
                 ##leaderboard:
                 leaderboard_list = leaderboard_top(file)
                 y = 120
@@ -326,9 +326,9 @@ def main():
                 for i in leaderboard_list:
                     title = font4.render(str(i), True, (0,100,100))
                     screen.blit(title, (50, y))
-                    title = font4.render(str(n) + ".", True, (0,50,50))
+                    title = font4.render(str(n) + ".", True, (0, 50, 50))
                     screen.blit(title, (30, y))
-                    n+=1
+                    n += 1
                     y += 30
                 
                 ##zasady
@@ -352,7 +352,7 @@ def main():
                 music_but = pygame.Rect(950, 215, 50, 40) ##left top wifth height
                 pygame.draw.rect(screen, [255,255,255], music_but) # draw button
             
-                title = font5.render('MUSIC:', True, (0,100,100))
+                title = font5.render('MUSIC:', True, (0, 100, 100))
                 screen.blit(title, (820, 220))
                 
                 musicSprite.update()
@@ -366,19 +366,19 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sit = False
-                elif event.type == KEYDOWN:
 
+                elif event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         sit = False
 
                     elif event.key == K_LEFT:
                         frog.position[0] = frog.position[0] - 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_left.png').convert_alpha()
+                        frog.image = frog_left
                         pygame.mixer.Channel(0).play(boing)
 
                     elif event.key == K_RIGHT:
                         frog.position[0] = frog.position[0] + 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_right.png').convert_alpha()
+                        frog.image = frog_right
                         pygame.mixer.Channel(0).play(boing)
 
                     elif event.key == K_UP:
@@ -389,7 +389,7 @@ def main():
                             frog.position[0] = 545
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                            frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         elif frog.position[1] < 130 and 150<frog.position[0]<220:
@@ -397,7 +397,7 @@ def main():
                             frog.position[0] = 185
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                            frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         elif frog.position[1] < 130 and 335<frog.position[0]<400:
@@ -405,7 +405,7 @@ def main():
                             frog.position[0] = 365
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                            frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         elif frog.position[1] < 130 and 690<frog.position[0]<760:
@@ -413,7 +413,7 @@ def main():
                             frog.position[0] = 725
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                            frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         elif frog.position[1] < 130 and 880<frog.position[0]<930:
@@ -421,17 +421,17 @@ def main():
                             frog.position[0] = 905
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                            frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         ### zwyczajny ruch w górę
                         elif frog.position[1] > 130:
                             frog.position[1] = frog.position[1] - 60
-                            frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba.png').convert_alpha()
+                            frog.image = frog_up
 
                     elif event.key == K_DOWN:
                         frog.position[1] = frog.position[1] + 60
-                        frog.image = pygame.image.load(r'C:\Users\admin\OneDrive\Pulpit\informatyka\gra\zaba_down.png').convert_alpha()
+                        frog.image = frpg_down
                         pygame.mixer.Channel(0).play(boing)
 
 
@@ -447,16 +447,16 @@ def main():
             time +=1
 
             ###render aut i logów
-            if addenemyfighterCounter >= 200:
+            if addenemyfighterCounter >= 300:
                 cars_sprites.add(cars())
                 cars_sprites.add(cars())
                 addenemyfighterCounter = 0
 
-            if addlogsl >= 350:
+            if addlogsl >= 360:
                 logs_sprites.add(logsl())
                 addlogsl = 0
 
-            if addlogsr >= 260:
+            if addlogsr >= 300:
                 logs_sprites.add(logsr())
                 addlogsr = 0
 
@@ -534,6 +534,9 @@ def main():
                 elif event.type == KEYDOWN:
                     if event.key == K_ESCAPE:
                         sit = False
+                    if event.key == pygame.K_RETURN:
+                        main()
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos  # gets mouse position
 
@@ -561,7 +564,7 @@ def main():
                 ex_but = pygame.Rect(1000, 760, 102, 40) ##left top wifth height
                 pygame.draw.rect(screen, [0, 0, 0], ex_but)  # draw button
                 font5 = pygame.font.SysFont(None, 40)
-                title = font5.render('EXIT', True, (0,100,100))
+                title = font5.render('EXIT', True, (0, 100, 100))
                 screen.blit(title, (1015, 770))
 
                 scoreboardSprite.add(win_table)
