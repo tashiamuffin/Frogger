@@ -40,7 +40,9 @@ game_over = pygame.mixer.Sound(r"images\game_over.wav")
 jingle = pygame.mixer.Sound(r"images\jingle.mp3")
 pygame.mixer.Sound.set_volume(jingle, 0.1)
 
-file = r"l.txt"
+file = r"level1.txt"
+file2 = "level2.txt"
+file3 = "level3.txt"
 
 class Frog(pygame.sprite.Sprite):
     def __init__(self):
@@ -78,16 +80,17 @@ class Frog(pygame.sprite.Sprite):
             self.ability -=1
 
 ### ----------------auta---------------
+# predkosc normal - 0.5
 class cars(pygame.sprite.Sprite):
   
-    def __init__(self):
+    def __init__(self, velocity):
         #730, 660, 600, 540, 470
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice([car1, car2, car3, car4, car5])
         self.rect = self.image.get_rect()
         self.position = random.choice([[0, 730], [0, 660], [0, 600], [0, 540], [0, 470]])
         self.rect.center = (self.position[0], self.position[1])
-        self.x_velocity = 0.5
+        self.x_velocity = velocity
 
     def update(self):
         self.position[0] += self.x_velocity
@@ -98,16 +101,16 @@ class cars(pygame.sprite.Sprite):
 
 ### ------------- kłody -----------
 
-class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo
+class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo - predkosc -0.4
   
-    def __init__(self):
+    def __init__(self, velocity):
         #360, 300, 240, 180, - pasy
         pygame.sprite.Sprite.__init__(self)
         self.image = log
         self.rect = self.image.get_rect()
         self.position = [SCREEN_WIDTH, random.choice([300, 180])]
         self.rect.center = (self.position[0],self.position[1])
-        self.x_velocity = -0.4
+        self.x_velocity = -velocity
 
     def update(self):
         self.position[0] += self.x_velocity
@@ -116,16 +119,16 @@ class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
 
-class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo
+class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo - predkosc 0.4
   
-    def __init__(self):
+    def __init__(self, velocity):
         #360, 300, 240, 180 - pasy
         pygame.sprite.Sprite.__init__(self)
         self.image = logl
         self.rect = self.image.get_rect()
         self.position = [0, random.choice([360,240,120])]
         self.rect.center = (self.position[0], self.position[1])
-        self.x_velocity = 0.4
+        self.x_velocity = velocity
 
     def update(self):
         self.position[0] += self.x_velocity
@@ -184,6 +187,16 @@ class MusicBoard(pygame.sprite.Sprite):
         self.image = self.font.render(self.text, 1, (0, 0, 0))
         self.rect = (955, 220)
 
+class LevelBoard(pygame.sprite.Sprite):
+    def __init__(self, text, place):
+        #inicjalizuj klasę bazową
+        pygame.font.init()
+        pygame.sprite.Sprite.__init__(self)
+        self.text = text
+        self.font = pygame.font.SysFont(None, 40)
+        self.image = self.font.render(self.text, 1, (0, 0, 0))
+        self.rect = place
+
 ##-----------------funkcje do obsługi pliku do leaderboardu
 def leaderboard_top(file):
     try:
@@ -213,7 +226,7 @@ def main():
 
     # Inicjalizuj obiekty
     cars_sprites = pygame.sprite.RenderClear() #kontener dla aut
-    cars_sprites.add(cars())
+    #cars_sprites.add(cars())
     logs_sprites = pygame.sprite.RenderClear() # kontener dla logs
 
     ## ilość żyć
@@ -223,6 +236,7 @@ def main():
     pygame.display.flip()
 
     musicSprite = pygame.sprite.RenderClear()
+    levelSprite = pygame.sprite.RenderClear()
 
     ##zmienne
     sit = True
@@ -235,7 +249,7 @@ def main():
     end_time = 0
     win_am = 1
     music = 1
-    #file = r"l.txt"
+    level = 2
 
     while sit:
         ## -------strona startowa ---------------------
@@ -273,6 +287,14 @@ def main():
                             music = 1
                             jingle.play(-1)
 
+                    elif level_but_1.collidepoint(mouse_pos):
+                        level = 1
+                    elif level_but_2.collidepoint(mouse_pos):
+                        level = 2
+                    elif level_but_3.collidepoint(mouse_pos):
+                        level = 3
+                
+
                 screen.blit(background, (0, 0))
                 
                 ##obsługa przycisku do muzyki
@@ -286,6 +308,20 @@ def main():
                     musicSprite.empty()
                     musicSprite.add(on_t)
                 
+
+                if level == 1:
+                    on_level = LevelBoard("on", (955,270))
+                    levelSprite.empty()
+                    levelSprite.add(on_level)
+                elif level == 2:
+                    on_level = LevelBoard("on", (955,315))
+                    levelSprite.empty()
+                    levelSprite.add(on_level)
+                elif level == 3:
+                    on_level = LevelBoard("on", (955,360))
+                    levelSprite.empty()
+                    levelSprite.add(on_level)
+
                 ##logo
                 frog_im = pygame.image.load(r'images/frogger.png').convert_alpha()
                 screen.blit(frog_im, (310, 300))
@@ -350,13 +386,28 @@ def main():
 
                 ##label do muzyki i przycisk
                 music_but = pygame.Rect(950, 215, 50, 40) ##left top wifth height
-                pygame.draw.rect(screen, [255,255,255], music_but) # draw button
+                pygame.draw.rect(screen, [255,255,255], music_but)
+                
+                level_but_1 = pygame.Rect(950, 265, 50, 40) ##left top wifth height
+                pygame.draw.rect(screen, [255,255,255], level_but_1)
+                level_but_2 = pygame.Rect(950, 310, 50, 40) ##left top wifth height
+                pygame.draw.rect(screen, [255,255,255], level_but_2)
+                level_but_3 = pygame.Rect(950, 355, 50, 40) ##left top wifth height
+                pygame.draw.rect(screen, [255,250,255], level_but_3) # draw button
             
                 title = font5.render('MUSIC:', True, (0, 100, 100))
                 screen.blit(title, (820, 220))
+                title = font5.render('Level 0', True, (0, 100, 100))
+                screen.blit(title, (820, 270))
+                title = font5.render('Level 1', True, (0, 100, 100))
+                screen.blit(title, (820, 315))
+                title = font5.render('Level 2', True, (0, 100, 100))
+                screen.blit(title, (820, 360))
                 
                 musicSprite.update()
+                levelSprite.update()
                 musicSprite.draw(screen)
+                levelSprite.draw(screen)
 
                 pygame.display.flip()
 
@@ -384,7 +435,7 @@ def main():
                     elif event.key == K_UP:
                         ####gdy żaba jest u samej góry i chce wejść na bezpieczną lilię
                         pygame.mixer.Channel(0).play(boing)
-                        if frog.position[1] < 130 and 520<frog.position[0]<570:
+                        if frog.position[1] < 130 and 520 < frog.position[0] < 570:
                             frog.position[1] = 60
                             frog.position[0] = 545
                             frog.ability = 0
@@ -392,7 +443,8 @@ def main():
                             frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
-                        elif frog.position[1] < 130 and 150<frog.position[0]<220:
+
+                        elif frog.position[1] < 130 and 150 < frog.position[0] < 220:
                             frog.position[1] = 60
                             frog.position[0] = 185
                             frog.ability = 0
@@ -400,7 +452,8 @@ def main():
                             frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
-                        elif frog.position[1] < 130 and 335<frog.position[0]<400:
+
+                        elif frog.position[1] < 130 and 335 < frog.position[0] < 400:
                             frog.position[1] = 60
                             frog.position[0] = 365
                             frog.ability = 0
@@ -408,7 +461,8 @@ def main():
                             frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
-                        elif frog.position[1] < 130 and 690<frog.position[0]<760:
+
+                        elif frog.position[1] < 130 and 690<frog.position[0] < 760:
                             frog.position[1] = 60
                             frog.position[0] = 725
                             frog.ability = 0
@@ -416,7 +470,8 @@ def main():
                             frog.image = frpg_down
                             frog = Frog()
                             frog_sprite.add(frog) 
-                        elif frog.position[1] < 130 and 880<frog.position[0]<930:
+
+                        elif frog.position[1] < 130 and 880<frog.position[0] < 930:
                             frog.position[1] = 60
                             frog.position[0] = 905
                             frog.ability = 0
@@ -444,22 +499,50 @@ def main():
             addenemyfighterCounter += 1
             addlogsl += 1
             addlogsr += 1
-            time +=1
+            time += 1
 
-            ###render aut i logów
-            if addenemyfighterCounter >= 300:
-                cars_sprites.add(cars())
-                cars_sprites.add(cars())
-                addenemyfighterCounter = 0
+            ###render aut i logów w zależności od poziomu
+            if level == 2:
+                if addenemyfighterCounter >= 300:
+                    cars_sprites.add(cars(0.5))
+                    cars_sprites.add(cars(0.5))
+                    addenemyfighterCounter = 0
 
-            if addlogsl >= 360:
-                logs_sprites.add(logsl())
-                addlogsl = 0
+                if addlogsl >= 360:
+                    logs_sprites.add(logsl(0.4))
+                    addlogsl = 0
 
-            if addlogsr >= 300:
-                logs_sprites.add(logsr())
-                addlogsr = 0
+                if addlogsr >= 300:
+                    logs_sprites.add(logsr(0.4))
+                    addlogsr = 0
 
+            elif level == 1:
+                if addenemyfighterCounter >= 450:
+                    cars_sprites.add(cars(0.4))
+                    cars_sprites.add(cars(0.4))
+                    addenemyfighterCounter = 0
+
+                if addlogsl >= 360:
+                    logs_sprites.add(logsl(0.3))
+                    addlogsl = 0
+
+                if addlogsr >= 350:
+                    logs_sprites.add(logsr(0.3))
+                    addlogsr = 0
+
+            elif level == 3:
+                if addenemyfighterCounter >= 200:
+                    cars_sprites.add(cars(0.6))
+                    cars_sprites.add(cars(0.6))
+                    addenemyfighterCounter = 0
+
+                if addlogsl >= 360:
+                    logs_sprites.add(logsl(0.5))
+                    addlogsl = 0
+
+                if addlogsr >= 350:
+                    logs_sprites.add(logsr(0.5))
+                    addlogsr = 0
             
             #Aktualizuj wszystkie sprite'y
             
@@ -499,8 +582,13 @@ def main():
                 frogs_arrived +=1
                 end_time = pygame.time.get_ticks()
                 time_sec = round(end_time/1000)
-                leaderboard_add(file, str(time_sec))
 
+                if level == 1:
+                    leaderboard_add(file, str(time_sec))
+                elif level == 2:
+                    leaderboard_add(file2, str(time_sec))
+                elif level == 3:
+                    leaderboard_add(file3, str(time_sec))
 
             #Wyczyść ekran
             
@@ -515,7 +603,7 @@ def main():
             
             ###koniec gry
             if lives <= 0:
-                    print("Koniec gry")
+                    pygame.mixer.Channel(2).play(game_over)
                     frogs_arrived = 6
                     end_time = pygame.time.get_ticks()
                     win_am = 0
