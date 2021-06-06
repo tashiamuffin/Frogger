@@ -1,15 +1,11 @@
 import pygame
-import random as Random
+import random 
 from pygame.locals import *
-from sys import exit
 import random
 
 
-### dodać poziomy
-
 SCREEN_WIDTH = 1102
 SCREEN_HEIGHT = 804
-WHITE = (255,255,255)
 pygame.init()
 
 screen = pygame.display.set_mode((1102,804), 0, 0) ###background ma 1102x804, width, depth 
@@ -22,7 +18,7 @@ background = pygame.image.load('images/bg.jpg').convert()
 frog_up = pygame.image.load(r'images/zaba.png').convert_alpha()
 frog_left = pygame.image.load(r'images/zaba_left.png').convert_alpha()
 frog_right = pygame.image.load(r'images/zaba_right.png').convert_alpha()
-frpg_down = pygame.image.load(r'images/zaba_down.png').convert_alpha()
+frog_down = pygame.image.load(r'images/zaba_down.png').convert_alpha()
 car1 = pygame.image.load(r'images/auto1.png').convert_alpha()
 car2 = pygame.image.load(r'images/auto2.png').convert_alpha()
 car3 = pygame.image.load(r'images/auto3.png').convert_alpha()
@@ -33,20 +29,24 @@ logl = pygame.image.load(r'images/logl.png').convert_alpha()
 
 pygame.mixer.init()
 
-boing = pygame.mixer.Sound(r"images\boing.mp3")
-car_crash = pygame.mixer.Sound(r"images\car_crash.mp3")
-water_fall = pygame.mixer.Sound(r"images\water_fall.mp3")
-game_over = pygame.mixer.Sound(r"images\game_over.wav")
-jingle = pygame.mixer.Sound(r"images\jingle.mp3")
+boing = pygame.mixer.Sound(r"sounds\boing.mp3")
+car_crash = pygame.mixer.Sound(r"sounds\car_crash.mp3")
+water_fall = pygame.mixer.Sound(r"sounds\water_fall.mp3")
+game_over = pygame.mixer.Sound(r"sounds\game_over.wav")
+jingle = pygame.mixer.Sound(r"sounds\jingle.mp3")
 pygame.mixer.Sound.set_volume(jingle, 0.1)
 
-file = r"level1.txt"
+file = "level1.txt"
 file2 = "level2.txt"
 file3 = "level3.txt"
 
+
 class Frog(pygame.sprite.Sprite):
+    """a class that creates a Frog - the main movable object in a game"""
+
     def __init__(self):
-        # Inicjalizuj klasę bazową Sprite
+        """ function initializing the frog """
+        
         pygame.sprite.Sprite.__init__(self)
         self.image = frog_up
         self.rect = self.image.get_rect() #rozmiar rysunku
@@ -55,8 +55,10 @@ class Frog(pygame.sprite.Sprite):
         self.ability = 1 ###umiejętność poruszania się, gdy jest -1 to nie może się ruszać (jest już na górze szczęsliwa i czeka na inne żabki)
 
     def update(self):
+        """ a function updating a location of a frog """
+
         if self.ability == 1: ##jeśli może się poruszać to
-            self.rect.center = (self.position[0],self.position[1])#move in-place
+            self.rect.center = (self.position[0],self.position[1])
 
             if self.rect.left < 0:
                 self.rect.left = 0
@@ -79,12 +81,17 @@ class Frog(pygame.sprite.Sprite):
 
             self.ability -=1
 
-### ----------------auta---------------
+### ----------------auta--------------------
 # predkosc normal - 0.5
 class cars(pygame.sprite.Sprite):
-  
+    """ a class that creates a moving car that can kill the frog"""
+
     def __init__(self, velocity):
-        #730, 660, 600, 540, 470
+        """ a function initializing the car
+        :param velocity (float): a velocity of the car
+        """
+
+        #730, 660, 600, 540, 470 - pasy
         pygame.sprite.Sprite.__init__(self)
         self.image = random.choice([car1, car2, car3, car4, car5])
         self.rect = self.image.get_rect()
@@ -93,6 +100,8 @@ class cars(pygame.sprite.Sprite):
         self.x_velocity = velocity
 
     def update(self):
+        """a function updating the location of the car"""
+
         self.position[0] += self.x_velocity
         self.rect.center = (self.position[0], self.position[1])
         
@@ -102,8 +111,13 @@ class cars(pygame.sprite.Sprite):
 ### ------------- kłody -----------
 
 class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo - predkosc -0.4
+    """a class that creates a log floating to the left"""
   
     def __init__(self, velocity):
+        """ a function initializing the log
+        :param velocity (float): a velocity of the log
+        """
+
         #360, 300, 240, 180, - pasy
         pygame.sprite.Sprite.__init__(self)
         self.image = log
@@ -113,24 +127,33 @@ class logsl(pygame.sprite.Sprite): ###kłody płynące w lewo - predkosc -0.4
         self.x_velocity = -velocity
 
     def update(self):
+        """a function updating the location of the log"""
+
         self.position[0] += self.x_velocity
         self.rect.center = (self.position[0], self.position[1])#move in-place
         
         if self.rect.right < 0 or self.rect.left > SCREEN_WIDTH:
             self.kill()
 
-class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo - predkosc 0.4
+class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo - predkosc 0.4 na normal
+    """a class that creates a log floating to the right"""
   
     def __init__(self, velocity):
+        """ a function initializing the log
+        :param velocity (float): a velocity of the log
+        """
+
         #360, 300, 240, 180 - pasy
         pygame.sprite.Sprite.__init__(self)
         self.image = logl
         self.rect = self.image.get_rect()
-        self.position = [0, random.choice([360,240,120])]
+        self.position = [0, random.choice([360, 240, 120])]
         self.rect.center = (self.position[0], self.position[1])
         self.x_velocity = velocity
 
     def update(self):
+        """a function updating the location of the log"""
+
         self.position[0] += self.x_velocity
         self.rect.center = (self.position[0], self.position[1])#move in-place
         
@@ -140,46 +163,65 @@ class logsr(pygame.sprite.Sprite): ###kłody płynące w prawo - predkosc 0.4
 #-------------------tablice z wynikami------
 
 class LiveBoard(pygame.sprite.Sprite):
+    """a class that creates a widget showing amount of lives"""
+
     def __init__(self):
-        #inicjalizuj klasę bazową
+        """a function initializing the widget"""
+
         pygame.sprite.Sprite.__init__(self)
         self.lives = 3
-        self.text = "lives: %4d" % self.lives
+        self.text = "Lives: %4d" % self.lives
         self.font = pygame.font.SysFont(None, 50)
-        self.image = self.font.render(self.text, 1, WHITE)
+        self.image = self.font.render(self.text, 1, (0,0,0))
         self.rect = (50, 5)
 
     def update(self):
+        """a function updating the amount of lives"""
+        
         self.lives -= 1
         self.text = "Lives: %4d" % self.lives
-        self.image = self.font.render(self.text, 1, WHITE)
+        self.image = self.font.render(self.text, 1, (0,0,0))
         self.rect = (50, 5)
 
 
 class WinBoard(pygame.sprite.Sprite):
+    """a class that creates a widget showing a score if there was a win"""
+
     def __init__(self,time, text):
-        #inicjalizuj klasę bazową
+        """a function initializing the widget
+        :param text (str): a text - time score
+        """
+
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.time = time
         self.text = ("YOU {} with time: %4d s" % int(self.time)).format(text)
         self.font = pygame.font.SysFont(None, 50)
-        self.image = self.font.render(self.text, 1, WHITE)
+        self.image = self.font.render(self.text, 1, (255,255,255))
         self.rect = (300, 410)
 
 class LossBoard(pygame.sprite.Sprite):
+    """a class that creates a widget showing a score if there was a loss"""
+
     def __init__(self):
-        #inicjalizuj klasę bazową
+        """a function initializing the widget"""
+
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = "YOU LOST :c TRY AGAIN"
         self.font = pygame.font.SysFont(None, 50)
-        self.image = self.font.render(self.text, 1, WHITE)
+        self.image = self.font.render(self.text, 1, (255,255,255))
         self.rect = (300, 410)
 
+
 class MusicBoard(pygame.sprite.Sprite):
+    """a class that creates a widget for handling music configurations"""
+
     def __init__(self, text):
-        #inicjalizuj klasę bazową
+        """ a function initializing the widget
+        :param text (str): a text to display
+        """
+
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = text
@@ -188,8 +230,14 @@ class MusicBoard(pygame.sprite.Sprite):
         self.rect = (955, 220)
 
 class LevelBoard(pygame.sprite.Sprite):
+    """a class that creates a widget for handling level configurations"""
+
     def __init__(self, text, place):
-        #inicjalizuj klasę bazową
+        """ a function initializing the widget
+        :param text (str): a text to display
+        :param place (tuple): a place to display the text
+        """
+
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = text
@@ -199,6 +247,10 @@ class LevelBoard(pygame.sprite.Sprite):
 
 ##-----------------funkcje do obsługi pliku do leaderboardu
 def leaderboard_top(file):
+    """a function that returns a list with top five scores from a given file
+    :param file (str): a path to the file with the scores
+    """
+
     try:
         leaderboard_file = open(file, 'r')
         leaderboard = leaderboard_file.readlines()
@@ -210,15 +262,27 @@ def leaderboard_top(file):
             return lead_list
         else:
             return lead_list[:5]
+
     except FileNotFoundError:
         return []
 
 def leaderboard_add(file, text):
+    """"a function adding a given score to the given file
+    :param file (str): a path to the file with scores
+    :param text (str): a score 
+    """
+
     leaderboard_file = open(file, 'a')
     leaderboard_file.write(text + "\n")
     leaderboard_file.close()
     
 def leaderboard_update(x, y, top_list):
+    """a function that displays the top 5 scores on the screen
+    :param x (int): an x location
+    :param y (int): a y location
+    :param top_list (list): a list with the scores
+    """
+
     font4 = pygame.font.SysFont(None, 30)
     n = 1
     for i in top_list:
@@ -230,15 +294,16 @@ def leaderboard_update(x, y, top_list):
         y += 30
 
         
-## ----------------main -------------
+## -----------------------------------main -------------------------------------------
 def main():
+    """a main function handling the whole game"""
+
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
     frog = Frog()                       #stwórz żabe
     frog_sprite.add(frog) 
 
     # Inicjalizuj obiekty
     cars_sprites = pygame.sprite.RenderClear() #kontener dla aut
-    #cars_sprites.add(cars())
     logs_sprites = pygame.sprite.RenderClear() # kontener dla logs
 
     ## ilość żyć
@@ -252,12 +317,11 @@ def main():
 
     ##-------zmienne---------
     sit = True
-    addenemyfighterCounter = 0
+    addcars = 0
     addlogsl = 0
     addlogsr = 0
     lives = 3
     frogs_arrived = -1
-    time = 0
     start_time = 0
     end_time = 0
     final_time = 0
@@ -266,14 +330,12 @@ def main():
     level = 2
 
     while sit:
-        ## -------strona startowa ---------------------
 
+        ## -------strona startowa ------------------------
         if frogs_arrived == -1: #obsługa muzyki w tle
             if music == 1:
                 jingle.play(-1)
 
-            ###zasady, o autorze, exit, leaderboard, konfig
-            
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -400,6 +462,7 @@ def main():
                 music_but = pygame.Rect(950, 215, 50, 40)
                 pygame.draw.rect(screen, [255,255,255], music_but)
                 
+                #-----------przyciski do poziomów---------------
                 level_but_1 = pygame.Rect(950, 265, 50, 40) 
                 pygame.draw.rect(screen, [255,255,255], level_but_1)
                 level_but_2 = pygame.Rect(950, 310, 50, 40)
@@ -416,6 +479,7 @@ def main():
                 title = font5.render('Level 2', True, (0, 100, 100))
                 screen.blit(title, (820, 360))
                 
+                #----------update sprite'ów------------------
                 musicSprite.update()
                 levelSprite.update()
                 musicSprite.draw(screen)
@@ -423,7 +487,7 @@ def main():
 
                 pygame.display.flip()
 
-        #------------------------gra właściwa---------------------
+        #------------------------gra właściwa-----------------------------------
         elif 0 <= frogs_arrived <= 5:
 
             for event in pygame.event.get():
@@ -452,7 +516,7 @@ def main():
                             frog.position[0] = 545
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = frpg_down
+                            frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
 
@@ -461,7 +525,7 @@ def main():
                             frog.position[0] = 185
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = frpg_down
+                            frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
 
@@ -470,7 +534,7 @@ def main():
                             frog.position[0] = 365
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = frpg_down
+                            frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
 
@@ -479,16 +543,16 @@ def main():
                             frog.position[0] = 725
                             frog.ability = 0
                             frogs_arrived +=1
-                            frog.image = frpg_down
+                            frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
 
-                        elif frog.position[1] < 130 and 880<frog.position[0] < 930:
+                        elif frog.position[1] < 130 and 880 < frog.position[0] < 930:
                             frog.position[1] = 60
                             frog.position[0] = 905
                             frog.ability = 0
-                            frogs_arrived +=1
-                            frog.image = frpg_down
+                            frogs_arrived += 1
+                            frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
                         ### zwyczajny ruch w górę
@@ -498,7 +562,7 @@ def main():
 
                     elif event.key == K_DOWN:
                         frog.position[1] = frog.position[1] + 60
-                        frog.image = frpg_down
+                        frog.image = frog_down
                         pygame.mixer.Channel(0).play(boing)
 
 
@@ -507,18 +571,17 @@ def main():
                 frog_sprite.draw(screen)
                 pygame.display.update()
             
-            ###update liczników do generowania obiektów
-            addenemyfighterCounter += 1
+            ###-----------update liczników do generowania obiektów----------
+            addcars += 1
             addlogsl += 1
             addlogsr += 1
-            time += 1
 
-            ###render aut i logów w zależności od poziomu
+            ###---------render aut i logów w zależności od poziomu-------
             if level == 2:
-                if addenemyfighterCounter >= 300:
+                if addcars >= 300:
                     cars_sprites.add(cars(0.5))
                     cars_sprites.add(cars(0.5))
-                    addenemyfighterCounter = 0
+                    addcars = 0
 
                 if addlogsl >= 360:
                     logs_sprites.add(logsl(0.4))
@@ -529,10 +592,10 @@ def main():
                     addlogsr = 0
 
             elif level == 1:
-                if addenemyfighterCounter >= 450:
+                if addcars >= 450:
                     cars_sprites.add(cars(0.4))
                     cars_sprites.add(cars(0.4))
-                    addenemyfighterCounter = 0
+                    addcars = 0
 
                 if addlogsl >= 360:
                     logs_sprites.add(logsl(0.3))
@@ -543,10 +606,10 @@ def main():
                     addlogsr = 0
 
             elif level == 3:
-                if addenemyfighterCounter >= 200:
+                if addcars >= 200:
                     cars_sprites.add(cars(0.6))
                     cars_sprites.add(cars(0.6))
-                    addenemyfighterCounter = 0
+                    addcars = 0
 
                 if addlogsl >= 360:
                     logs_sprites.add(logsl(0.5))
@@ -556,7 +619,7 @@ def main():
                     logs_sprites.add(logsr(0.5))
                     addlogsr = 0
             
-            #Aktualizuj wszystkie sprite'y
+            #----------Aktualizuj wszystkie sprite'y-------------
             
             cars_sprites.update()
             logs_sprites.update()
@@ -619,7 +682,6 @@ def main():
             if lives <= 0:
                     pygame.mixer.Channel(2).play(game_over)
                     frogs_arrived = 6
-                    #start_time = pygame.time.get_ticks()
                     win_am = 0
 
             pygame.display.flip()
@@ -650,7 +712,7 @@ def main():
                 
                 ###------------render wiadomości-----------
                 if win_am:
-                    win_table = WinBoard(final_time/1000,"WON")
+                    win_table = WinBoard(final_time/1000, "WON")
                 else:  
                     win_table = LossBoard()
                 
