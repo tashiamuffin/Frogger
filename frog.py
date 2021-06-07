@@ -194,9 +194,9 @@ class WinBoard(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.time = time
         self.text = ("YOU {} with time: %4d s" % int(self.time)).format(text)
-        self.font = pygame.font.SysFont(None, 50)
+        self.font = pygame.font.SysFont(None, 70)
         self.image = self.font.render(self.text, 1, (255,255,255))
-        self.rect = (300, 410)
+        self.rect = (250, 400)
 
 class LossBoard(pygame.sprite.Sprite):
     """a class that creates a widget showing a score if there was a loss"""
@@ -207,9 +207,9 @@ class LossBoard(pygame.sprite.Sprite):
         pygame.font.init()
         pygame.sprite.Sprite.__init__(self)
         self.text = "YOU LOST :c TRY AGAIN"
-        self.font = pygame.font.SysFont(None, 50)
+        self.font = pygame.font.SysFont(None, 70)
         self.image = self.font.render(self.text, 1, (255,255,255))
-        self.rect = (300, 410)
+        self.rect = (250, 400)
 
 
 class MusicBoard(pygame.sprite.Sprite):
@@ -291,10 +291,33 @@ def leaderboard_update(x, y, top_list):
         n += 1
         y += 30
 
-        
+#------------------------funkcja tworząca labelki------------
+def button_create(text, place, color, font):
+    """a function that creates a label
+    :param text (str): a text to display
+    :param place (tuple): a place to display the text
+    :param color (tuple): a color for the displayed text
+    :param font (pygame.font.Font): a font for the displayed text
+    """
+
+    title = font.render(text, True, color)
+    screen.blit(title, place)
+
+
 ## -----------------------------------main -------------------------------------------
-def main():
-    """a main function handling the whole game"""
+def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_arrived = -1, win_am = 1, music = 1, level = 2):
+    """a main function handling the whole game
+    :param sit (bool): a condition for the game to be working
+    :param addcars (int): counter for adding cars
+    :param addlogsl (int): counter for adding left logs
+    :param addlogsl (int): counter for adding right logs
+    :param lives (int): amount of lives
+    :param frogs_arrived (int): a number of frogs that arrived in safe spot
+    :param start_time (int): starting time
+    :param win_am (int): a number representing a win or loss
+    :param music(int): a number representing turning on or off the music
+    :param level (int): a number representing a level
+    """
 
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
     frog = Frog()                       #stwórz żabe
@@ -313,22 +336,7 @@ def main():
     musicSprite = pygame.sprite.RenderClear()
     levelSprite = pygame.sprite.RenderClear()
 
-    ##-------zmienne---------
-    sit = True
-    addcars = 0
-    addlogsl = 0
-    addlogsr = 0
-    lives = 3
-    frogs_arrived = -1
-    start_time = 0
-    end_time = 0
-    final_time = 0
-    win_am = 1
-    music = 1
-    level = 2
-
     while sit:
-
         ## -------strona startowa ------------------------
         if frogs_arrived == -1: #obsługa muzyki w tle
             if music == 1:
@@ -405,34 +413,22 @@ def main():
                 button = pygame.Rect(300, 400, 450, 50) ##left top wifth height
                 pygame.draw.rect(screen, [0, 0, 0], button)  # draw button
                 font = pygame.font.SysFont(None, 24)
-                img = font.render('PRESS ENTER OR THIS BUTTON TO START THE GAME', True, (255, 244, 244))
-                screen.blit(img, (310, 420))
+                button_create('PRESS ENTER OR THIS BUTTON TO START THE GAME', (310, 420), (255, 244, 244), font)
                 
                 ###--------------labelki----------------
                 font3 = pygame.font.SysFont("comicsansms", 40)
-                title = font3.render('LEADERBOARD', True, (0, 50, 50))
-                screen.blit(title, (20, 30))
-
-                title = font3.render('AUTHOR:', True, (0, 50, 50))
-                screen.blit(title, (820, 30))
-
-                title = font3.render('CONFIG', True, (0, 50, 50))
-                screen.blit(title, (820, 150))
-
-                title = font3.render('THE RULES:', True, (255, 221, 0))
-                screen.blit(title, (400, 510))
+                button_create('THE RULES:', (400, 510), (255, 221, 0), font3)
+                button_create('LEADERBOARD', (20, 30), (0, 50, 50), font3)
+                button_create('AUTHOR:', (820, 30), (0, 50, 50), font3)
+                button_create('CONFIG', (820, 150), (0, 50, 50), font3)
 
                 font4 = pygame.font.SysFont(None, 30)
-                title = font4.render('Natalia Lach', True, (0, 100, 100))
-                screen.blit(title, (820, 90))
+                button_create('Natalia Lach', (820, 90), (0, 100, 100), font4)
 
                 fontL = pygame.font.SysFont(None, 30)
-                title = fontL.render('EASY:', True, (0, 50, 50))
-                screen.blit(title, (20, 90))
-                title = fontL.render('NORMAL:', True, (0, 50, 50))
-                screen.blit(title, (120, 90))
-                title = fontL.render('HARD:', True, (0, 50, 50))
-                screen.blit(title, (230, 90))
+                button_create('EASY:', (20, 90), (0, 50, 50), fontL)
+                button_create('NORMAL:', (120, 90), (0, 50, 50), fontL)
+                button_create('HARD:', (230, 90), (0, 50, 50), fontL)
                 
                 #------- leaderboard-------
                 leaderboard_update(150, 120, leaderboard_top(file2))
@@ -440,21 +436,17 @@ def main():
                 leaderboard_update(260, 120, leaderboard_top(file3))
                 
                 ##-----------zasady--------------
-                title = font4.render('This is a classic arcade game, in which your goal is to lead the frog family across the street and river.', True, (200,200,200))
-                screen.blit(title, (80, 575))
-                title = font4.render('Attention! The frog dies when it is hit by the car or when it falls to the water.', True, (200,200,200))
-                screen.blit(title, (150, 610))
-                title = font4.render('Once all the five frogs are safe on the lily pads, you win.', True, (200,200,200))
-                screen.blit(title, (250, 645))
-                title = font4.render('You steer the frog with key arrows.', True, (200,200,200))
-                screen.blit(title, (350, 700))
+                button_create('This is a classic arcade game, in which your goal is to lead the frog family across the street and river.',(80, 575), (200,200,200), font4)
+                button_create('Attention! The frog dies when it is hit by the car or when it falls to the water.', (150, 610), (200,200,200), font4)
+                button_create('Once all the five frogs are safe on the lily pads, you win.', (250, 645), (200,200,200), font4)
+                button_create('You steer the frog with key arrows.', (350, 700), (200,200,200), font4)
+                
 
                 ##-----------przycisk exit---------
                 ex_but = pygame.Rect(1000, 760, 102, 40) 
                 pygame.draw.rect(screen, [0, 0, 0], ex_but) 
                 font5 = pygame.font.SysFont(None, 40)
-                title = font5.render('EXIT', True, (0,100,100))
-                screen.blit(title, (1015, 770))
+                button_create('EXIT', (1015, 770), (0,100,100), font5)
 
                 ##-------------label do muzyki i przycisk--------------
                 music_but = pygame.Rect(950, 215, 50, 40)
@@ -468,14 +460,10 @@ def main():
                 level_but_3 = pygame.Rect(950, 355, 50, 40)
                 pygame.draw.rect(screen, [255,250,255], level_but_3) 
             
-                title = font5.render('MUSIC:', True, (0, 100, 100))
-                screen.blit(title, (820, 220))
-                title = font5.render('Level 0', True, (0, 100, 100))
-                screen.blit(title, (820, 270))
-                title = font5.render('Level 1', True, (0, 100, 100))
-                screen.blit(title, (820, 315))
-                title = font5.render('Level 2', True, (0, 100, 100))
-                screen.blit(title, (820, 360))
+                button_create('MUSIC',(820, 220), (0, 100, 100), font5)
+                button_create('Easy:', (820, 270), (0, 100, 100), font5)
+                button_create('Normal:', (820, 315), (0, 100, 100), font5)
+                button_create('Hard:', (820, 360), (0, 100, 100), font5)
                 
                 #----------update sprite'ów------------------
                 musicSprite.update()
@@ -697,13 +685,13 @@ def main():
                     if event.key == K_ESCAPE:
                         sit = False
                     if event.key == pygame.K_RETURN:
-                        main()
+                        main(True, 0, 0, 0, 3, -1, 1, music, level)
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = event.pos  # gets mouse position
 
                     if button.collidepoint(mouse_pos): ##restart gry
-                        main()
+                        main(True, 0, 0, 0, 3, -1, 1, music, level)
 
                     if ex_but.collidepoint(mouse_pos): ##wyjście
                         sit = False
@@ -719,15 +707,13 @@ def main():
                 button = pygame.Rect(300, 480, 420, 50) 
                 pygame.draw.rect(screen, [0, 0, 0], button) 
                 font = pygame.font.SysFont(None, 24)
-                img = font.render('PRESS ENTER OR THIS BUTTON TO START AGAIN', True, (255,244,244))
-                screen.blit(img, (310, 500))
+                button_create('PRESS ENTER OR THIS BUTTON TO START AGAIN', (310, 500), (255,244,244), font)
 
                 ##------------przycisk wyjścia----------------
                 ex_but = pygame.Rect(1000, 760, 102, 40) 
                 pygame.draw.rect(screen, [0, 0, 0], ex_but)  
                 font5 = pygame.font.SysFont(None, 40)
-                title = font5.render('EXIT', True, (0, 100, 100))
-                screen.blit(title, (1015, 770))
+                button_create('EXIT', (1015,770), (0,100,100), font5)
 
                 scoreboardSprite.add(win_table)
                 scoreboardSprite.draw(screen)
