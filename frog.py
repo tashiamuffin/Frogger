@@ -1,8 +1,6 @@
 import pygame
 import random 
 from pygame.locals import *
-import random
-
 
 SCREEN_WIDTH = 1102
 SCREEN_HEIGHT = 804
@@ -10,15 +8,15 @@ pygame.init()
 
 screen = pygame.display.set_mode((1102,804), 0, 0) ###background ma 1102x804, width, depth 
 pygame.display.set_caption('Frogger')
-programIcon = pygame.image.load(r'images/zaba.png')
+programIcon = pygame.image.load(r'images/zaba1.png')
 pygame.display.set_icon(programIcon)
 ##ładowanie obrazków
 
 background = pygame.image.load('images/bg.jpg').convert()
-frog_up = pygame.image.load(r'images/zaba.png').convert_alpha()
-frog_left = pygame.image.load(r'images/zaba_left.png').convert_alpha()
-frog_right = pygame.image.load(r'images/zaba_right.png').convert_alpha()
-frog_down = pygame.image.load(r'images/zaba_down.png').convert_alpha()
+frog_up = pygame.image.load(r'images/zaba1.png').convert_alpha()
+frog_left = pygame.image.load(r'images/zaba_left1.png').convert_alpha()
+frog_right = pygame.image.load(r'images/zaba_right1.png').convert_alpha()
+frog_down = pygame.image.load(r'images/zaba_down1.png').convert_alpha()
 car1 = pygame.image.load(r'images/auto1.png').convert_alpha()
 car2 = pygame.image.load(r'images/auto2.png').convert_alpha()
 car3 = pygame.image.load(r'images/auto3.png').convert_alpha()
