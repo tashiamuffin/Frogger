@@ -305,7 +305,7 @@ def button_create(text, place, color, font):
 
 
 ## -----------------------------------main -------------------------------------------
-def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_arrived = -1, win_am = 1, music = 1, level = 2):
+def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_arrived = -1, win_am = 1, music = 1, level = 2, file = file, file2 = file2, file3 = file3):
     """a main function handling the whole game
     :param sit (bool): a condition for the game to be working
     :param addcars (int): counter for adding cars
@@ -317,6 +317,9 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
     :param win_am (int): a number representing a win or loss
     :param music(int): a number representing turning on or off the music
     :param level (int): a number representing a level
+    :param file (str): a path to the file with scores on level easy
+    :param file2 (str): a path to the file with scores on level normal
+    :param file3 (str): a path to the file with scores on level hard
     """
 
     frog_sprite = pygame.sprite.RenderClear() #kontener na żabe
@@ -393,15 +396,15 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                 
                 ##-------------obsługa poziomów----------------
                 if level == 1:
-                    on_level = LevelBoard("on", (955,270))
+                    on_level = LevelBoard("on", (955, 270))
                     levelSprite.empty()
                     levelSprite.add(on_level)
                 elif level == 2:
-                    on_level = LevelBoard("on", (955,315))
+                    on_level = LevelBoard("on", (955, 315))
                     levelSprite.empty()
                     levelSprite.add(on_level)
                 elif level == 3:
-                    on_level = LevelBoard("on", (955,360))
+                    on_level = LevelBoard("on", (955, 360))
                     levelSprite.empty()
                     levelSprite.add(on_level)
 
@@ -437,9 +440,9 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                 
                 ##-----------zasady--------------
                 button_create('This is a classic arcade game, in which your goal is to lead the frog family across the street and river.',(80, 575), (200,200,200), font4)
-                button_create('Attention! The frog dies when it is hit by the car or when it falls to the water.', (150, 610), (200,200,200), font4)
-                button_create('Once all the five frogs are safe on the lily pads, you win.', (250, 645), (200,200,200), font4)
-                button_create('You steer the frog with key arrows.', (350, 700), (200,200,200), font4)
+                button_create('Attention! The frog dies when it is hit by the car or when it falls to the water.', (150, 610), (200, 200, 200), font4)
+                button_create('Once all the five frogs are safe on the lily pads, you win.', (250, 645), (200, 200, 200), font4)
+                button_create('You steer the frog with key arrows.', (350, 700), (200, 200, 200), font4)
                 
 
                 ##-----------przycisk exit---------
@@ -454,11 +457,11 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                 
                 #-----------przyciski do poziomów---------------
                 level_but_1 = pygame.Rect(950, 265, 50, 40) 
-                pygame.draw.rect(screen, [255,255,255], level_but_1)
+                pygame.draw.rect(screen, [255, 255, 255], level_but_1)
                 level_but_2 = pygame.Rect(950, 310, 50, 40)
-                pygame.draw.rect(screen, [255,255,255], level_but_2)
+                pygame.draw.rect(screen, [255, 255, 255], level_but_2)
                 level_but_3 = pygame.Rect(950, 355, 50, 40)
-                pygame.draw.rect(screen, [255,250,255], level_but_3) 
+                pygame.draw.rect(screen, [255, 250, 255], level_but_3) 
             
                 button_create('MUSIC',(820, 220), (0, 100, 100), font5)
                 button_create('Easy:', (820, 270), (0, 100, 100), font5)
@@ -501,7 +504,7 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                             frog.position[1] = 60
                             frog.position[0] = 545
                             frog.ability = 0
-                            frogs_arrived +=1
+                            frogs_arrived += 1
                             frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
@@ -510,7 +513,7 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                             frog.position[1] = 60
                             frog.position[0] = 185
                             frog.ability = 0
-                            frogs_arrived +=1
+                            frogs_arrived += 1
                             frog.image = frog_down
                             frog = Frog()
                             frog_sprite.add(frog) 
@@ -640,10 +643,9 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
 
             ####---------------wygrana-------------
             if frogs_arrived == 5:
-                frogs_arrived +=1
+                frogs_arrived += 1
                 end_time = pygame.time.get_ticks()
                 final_time = end_time - start_time
-
                 time_sec = round(final_time/1000)
 
                 if level == 1:
@@ -707,20 +709,19 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
                 button = pygame.Rect(300, 480, 420, 50) 
                 pygame.draw.rect(screen, [0, 0, 0], button) 
                 font = pygame.font.SysFont(None, 24)
-                button_create('PRESS ENTER OR THIS BUTTON TO START AGAIN', (310, 500), (255,244,244), font)
+                button_create('PRESS ENTER OR THIS BUTTON TO START AGAIN', (310, 500), (255, 244, 244), font)
 
                 ##------------przycisk wyjścia----------------
                 ex_but = pygame.Rect(1000, 760, 102, 40) 
                 pygame.draw.rect(screen, [0, 0, 0], ex_but)  
                 font5 = pygame.font.SysFont(None, 40)
-                button_create('EXIT', (1015,770), (0,100,100), font5)
+                button_create('EXIT', (1015, 770), (0, 100, 100), font5)
 
                 scoreboardSprite.add(win_table)
                 scoreboardSprite.draw(screen)
                                     
                 pygame.display.flip()
     
-
     pygame.quit()
 
 main()
