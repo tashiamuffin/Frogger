@@ -724,5 +724,6 @@ def main(sit = True, addcars = 0, addlogsl = 0, addlogsr = 0, lives = 3, frogs_a
     
     pygame.quit()
 
-main()
+if __name__ == "__main__":
+    main()
 
